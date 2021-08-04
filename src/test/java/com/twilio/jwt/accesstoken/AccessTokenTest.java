@@ -140,6 +140,31 @@ public class AccessTokenTest {
     }
 
     @Test
+    public void testPlaybackUrlGrant() {
+
+        Map<String, Object> player = new HashMap<>();
+        player.put("playbackUrl", "https://video.net?token=eyJ3423432434234234");
+        player.put("playerStreamerSid", "VJ123");
+
+        PlayerGrant playerGrant = new PlayerGrant()
+                .setPayload(player);
+
+        Jwt token =
+                new AccessToken.Builder(ACCOUNT_SID, SIGNING_KEY_SID, SECRET)
+                        .grant(playerGrant)
+                        .build();
+
+        Claims claims = getClaimFromJwtToken(token);
+
+        validateToken(claims);
+
+        Map<String, Object> decodedGrants = (Map<String, Object>) claims.get("grants");
+        Assert.assertEquals(1, decodedGrants.size());
+        Assert.assertEquals(player, decodedGrants.get("player"));
+
+    }
+
+    @Test
     public void testChatGrant() {
         ChatGrant cg = new ChatGrant()
             .setDeploymentRoleSid("RL123")
